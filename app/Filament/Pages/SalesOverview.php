@@ -6,6 +6,7 @@ use App\Filament\Widgets\SalesChart;
 use App\Filament\Widgets\SalesPerProductChart;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -13,6 +14,8 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class SalesOverview extends Page implements HasTable
 {
@@ -40,6 +43,26 @@ class SalesOverview extends Page implements HasTable
     {
         return $table
             ->query(Sale::query())
+            ->filters([
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->default(now()),
+                        DatePicker::make('created_at')
+                            ->default(now()),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_at'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+            ])
             ->columns([
                 TextColumn::make('total_amount')
                     ->label('Total Amount')
