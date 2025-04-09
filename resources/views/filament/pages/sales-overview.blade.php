@@ -1,8 +1,10 @@
 <x-filament-panels::page>
-    <div x-data="{ isOpen: true }" class="bg-gray-100 p-4 shadow rounded-lg">
+    <div x-data="{ isOpen: localStorage.getItem('salesPageOpen') === 'true' }"
+        class="bg-gray-100 p-4 shadow rounded-lg">
 
         <!-- Toggle Button -->
-        <button @click="isOpen = !isOpen" class="text-primary-600 px-4 py-2 mb-4">
+        <button @click="isOpen = !isOpen; localStorage.setItem('salesPageOpen', isOpen)"
+            class="text-primary-600 px-4 py-2 mb-4">
             <span x-show="!isOpen">Show Sales Overview</span>
             <span x-show="isOpen">Hide Sales Overview</span>
         </button>

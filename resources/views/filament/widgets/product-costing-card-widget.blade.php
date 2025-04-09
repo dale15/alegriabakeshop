@@ -1,7 +1,9 @@
 <x-filament-widgets::widget>
     {{-- Widget content --}}
-    <div x-data="{ isOpen: true }" class="bg-gray-100 p-4 shadow rounded-lg">
-        <button @click="isOpen = !isOpen" class="text-primary-600 px-4 py-2 mb-2">
+    <div x-data="{ isOpen: localStorage.getItem('RawMaterialPageOpen') === 'true' }"
+        class="bg-gray-100 p-4 shadow rounded-lg">
+        <button @click="isOpen = !isOpen; localStorage.setItem('RawMaterialPageOpen', isOpen)"
+            class="text-primary-600 px-4 py-2 mb-2">
             <span x-show="!isOpen">Show Product Costing</span>
             <span x-show="isOpen">Hide Product Costing</span>
         </button>
