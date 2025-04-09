@@ -14,6 +14,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -50,7 +51,7 @@ class SalesOverview extends Page implements HasTable
                             ->default(now()),
                         DatePicker::make('created_at')
                             ->default(now()),
-                    ])
+                    ])->columnSpan(2)->columns(2)
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
@@ -62,7 +63,8 @@ class SalesOverview extends Page implements HasTable
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
-            ])
+                ])
+            ->filtersFormColumns(2)
             ->columns([
                 TextColumn::make('total_amount')
                     ->label('Total Amount')

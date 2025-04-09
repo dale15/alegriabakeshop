@@ -13,10 +13,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Split;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductResource extends Resource
 {
@@ -83,7 +84,10 @@ class ProductResource extends Resource
                     }),
             ])
             ->filters([
-                //
+                Filter::make('is_box')
+                    ->label('Boxes')
+                    ->toggle()
+                    ->query(fn(Builder $query): Builder => $query->where('is_box', true))
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

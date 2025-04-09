@@ -13,9 +13,9 @@ class InventoryTableWidget extends BaseWidget
     {
         return $table
             ->query(Inventory::query())
-            ->heading('Raw Materials')
+            ->heading('')
             ->columns([
-                TextColumn::make('ingredient.name')->label('Raw Material'),
+                TextColumn::make('ingredient.name')->label('Raw Material')->searchable()->sortable(),
                 TextColumn::make('ingredient.price')->label('Price')->money('PHP'),
                 TextColumn::make('quantity')
                     ->label('In Stock')
