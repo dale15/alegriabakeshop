@@ -70,7 +70,8 @@ class Inventory extends Page
                         ['name' => $data['ingredient_name']],
                         [
                             'unit_of_measure' => $data['unit_of_measure'] ?? null,
-                            'price' => $data['price'] ?? null
+                            'price' => $data['price'] ?? null,
+                            'quantity_in_stock' => $data['quantity']
                         ],
                     );
 

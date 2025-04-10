@@ -36,7 +36,9 @@ class ProductResource extends Resource
                     ->schema([
                         TextInput::make('name')->label('Product Name')->required(),
                         TextInput::make('selling_price')->label('Selling Price')->numeric()->required(),
-                        Select::make('category_id')->relationship('category', 'name'),
+                        Select::make('category_id')
+                            ->relationship('category', 'name')
+                            ->placeholder('No Category yet.'),
                         // TextInput::make('cost_price')->label('Cost')->numeric(),
                         Toggle::make('is_box')->label('Box'),
                     ])->columnSpan(2)->columns(2),
