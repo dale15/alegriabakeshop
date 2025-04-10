@@ -81,7 +81,6 @@ class Inventory extends Page
                         'ingredient_id'   => $ingredient->id,
                         'quantity'        => $data['quantity'],
                         'reorder_level'   => $data['reorder_level'],
-                        'cost_per_unit'   => $ingredient->price / $baseUnit->getBaseUnit(),
                     ]);
 
                     Notification::make()
