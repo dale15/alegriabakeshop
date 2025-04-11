@@ -16,7 +16,7 @@ class ProductImporter extends Importer
     {
         return [
             ImportColumn::make('name'),
-            ImportColumn::make('category_id')->label('Category'),
+            ImportColumn::make('category_name')->label('Category'),
             ImportColumn::make('cost_price'),
             ImportColumn::make('selling_price'),
         ];
@@ -26,7 +26,7 @@ class ProductImporter extends Importer
     {
 
         $category = Category::firstOrCreate([
-            'name' => $this->data['category_id'],
+            'name' => $this->data['category_name'],
         ], [
             'description' => '',
         ]);
