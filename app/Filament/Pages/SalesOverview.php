@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\SalesChart;
+use App\Filament\Widgets\SalesOverviewChartWidget;
 use App\Filament\Widgets\SalesPerProductChart;
 use App\Models\Sale;
 use App\Models\SaleItem;

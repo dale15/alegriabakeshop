@@ -2,6 +2,7 @@
 
 namespace App\Filament\Imports;
 
+use App\Models\Category;
 use App\Models\Product;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
@@ -15,17 +16,27 @@ class ProductImporter extends Importer
     {
         return [
             ImportColumn::make('name'),
+            ImportColumn::make('category_id')->label('Category'),
+            ImportColumn::make('cost_price'),
             ImportColumn::make('selling_price'),
         ];
     }
 
     public function resolveRecord(): ?Product
     {
+
+        $category = Category::firstOrCreate([
+            ['name' => $this->data['category_id']],
+            ['description' => '']
+        ]);
+
         return Product::firstOrNew([
             'name' => $this->data['name'],
         ], [
             'name' => $this->data['name'],
+            'category_id' => $category->id,
             'selling_price' => $this->data['selling_price'],
+            'cost_price' => $this->data['cost_price'],
             'is_box' => 0,
         ]);
     }

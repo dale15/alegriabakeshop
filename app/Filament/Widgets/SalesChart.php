@@ -4,7 +4,8 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
 use App\Models\Sale;
-use Carbon\Carbon;
+use Flowframe\Trend\Trend;
+use Flowframe\Trend\TrendValue;
 
 class SalesChart extends ChartWidget
 {
@@ -13,47 +14,93 @@ class SalesChart extends ChartWidget
     protected function getFilters(): ?array
     {
         return [
-            'daily' => 'Last 7 Days',
-            'monthly' => 'Last 6 Months',
-            'yearly' => 'Last 1 Year',
+            'today' => 'Today',
+            'this_week' => 'This week',
+            'last_week' => 'Last week',
+            'this_month' => 'This Month',
+            'last_month' => 'Last Month',
+            'this_year' => 'This year',
         ];
     }
 
     protected function getData(): array
     {
-        $filter = $this->filter ?? 'daily'; // Default to daily if no filter selected
+        $activeFilter = $this->filter ?? 'today';
 
-        if ($filter === 'daily') {
-            $sales = Sale::selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue')
-                ->where('created_at', '>=', Carbon::now()->subDays(7))
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get();
-        } elseif ($filter === 'monthly') {
-            $sales = Sale::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as date, SUM(total_amount) as revenue')
-                ->where('created_at', '>=', Carbon::now()->subMonths(6))
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get();
-        } else { // Yearly
-            $sales = Sale::selectRaw('YEAR(created_at) as date, SUM(total_amount) as revenue')
-                ->where('created_at', '>=', Carbon::now()->subYears(1))
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get();
+        // Default to 'yearly' if no filter is set
+        $startDate = now()->startOfDay();
+        $endDate = now()->endOfDay();
+        $grouping = 'perHour';
+
+        switch ($activeFilter) {
+            case 'today':
+                $startDate = now()->startOfDay();
+                $endDate = now()->endOfDay();
+                $grouping = 'perHour';
+                break;
+
+            case 'this_week':
+                $startDate = now()->startOfWeek();
+                $endDate = now()->endOfWeek();
+                $grouping = 'perDay';
+                break;
+
+            case 'last_week':
+                $startDate = now()->subWeek()->startOfWeek();
+                $endDate = now()->subWeek()->endOfWeek();
+                $grouping = 'perDay';
+                break;
+
+            case 'this_month':
+                $startDate = now()->startOfMonth();
+                $endDate = now()->endOfMonth();
+                $grouping = 'perDay';
+                break;
+
+            case 'last_month':
+                $startDate = now()->subMonth()->startOfMonth();
+                $endDate = now()->subMonth()->endOfMonth();
+                $grouping = 'perDay';
+                break;
+
+            case 'this_year':
+                $startDate = now()->startOfYear();
+                $endDate = now()->endOfYear();
+                $grouping = 'perMonth';
+                break;
+
+            case 'last_year':
+                $startDate = now()->subYear()->startOfYear();
+                $endDate = now()->subYear()->endOfYear();
+                $grouping = 'perMonth';
+                break;
+
+            case 'all_time':
+                $startDate = Sale::min('created_at') ?? now()->startOfYear();
+                $endDate = Sale::max('created_at') ?? now();
+                $grouping = 'perYear';
+                break;
         }
+
+        $trend = Trend::model(Sale::class)->between(start: $startDate, end: $endDate);
+        $trend = match ($grouping) {
+            'perHour' => $trend->perHour(),
+            'perDay' => $trend->perDay(),
+            'perMonth' => $trend->perMonth(),
+            'perYear' => $trend->perYear(),
+            default => $trend->perDay(),
+        };
+
+        $data = $trend->sum('total_amount');
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Revenue',
-                    'data' => $sales->pluck('revenue')->toArray(),
-                    'borderColor' => '#3b82f6',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
-                    'fill' => true,
+                    'label' => 'Total Sales',
+                    'data' => $data->map(fn(TrendValue $value) => $value->aggregate),
                 ],
             ],
-            'labels' => $sales->pluck('date')->toArray(),
+            'labels' => $data->map(fn(TrendValue $value) => $value->date),
         ];
     }
 

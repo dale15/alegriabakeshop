@@ -8,12 +8,15 @@ use App\Models\Product;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -36,8 +39,21 @@ class ProductResource extends Resource
                     ->schema([
                         TextInput::make('name')->label('Product Name')->required(),
                         TextInput::make('selling_price')->label('Selling Price')->numeric()->required(),
-                        Select::make('category_id')->relationship('category', 'name'),
-                        // TextInput::make('cost_price')->label('Cost')->numeric(),
+                        Select::make('category_id')->relationship('category', 'name')
+                            ->createOptionForm([
+                                TextInput::make('name')->label('Category Name')
+                            ])
+                            ->createOptionAction(function ($action) {
+                                return $action
+                                    ->after(function (Set $set, Get $get, $state) {
+                                        Notification::make()
+                                            ->title('Category Created')
+                                            ->body('The category "' . $get('name') . '" has been added successfully.')
+                                            ->success()
+                                            ->send();
+                                    });
+                            }),
+                        TextInput::make('cost_price')->label('Cost')->numeric(),
                         Toggle::make('is_box')->label('Box'),
                     ])->columnSpan(2)->columns(2),
                 Section::make('Image')
