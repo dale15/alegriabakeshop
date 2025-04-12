@@ -68,7 +68,7 @@
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-6 h-screen">
+    <main class="container mx-auto px-4 py-6">
         {{ $slot }}
     </main>
 

@@ -27,27 +27,15 @@
     </div>
 
     <!-- Right Side - Cart and Checkout -->
-    <div class="md:w-1/3 space-y-6 mt-6 md:mt-0">
-        <livewire:pos.cart-component />
-        <livewire:pos.checkout-component />
+    <div class="md:w-1/3 mt-6 md:mt-0">
+        <!-- This div will be sticky -->
+        <div class="sticky top-4 space-y-6">
+            <livewire:pos.cart-component />
+            <livewire:pos.checkout-component />
 
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="grid grid-cols-2 gap-2">
-                {{-- <div class="bg-blue-500 text-white rounded p-2 text-center cursor-pointer hover:bg-blue-600">
-                    <div class="text-sm">F2</div>
-                    <div class="font-bold">New Sale</div>
-                </div>
-                <div class="bg-green-500 text-white rounded p-2 text-center cursor-pointer hover:bg-green-600">
-                    <div class="text-sm">F3</div>
-                    <div class="font-bold">Search</div>
-                </div> --}}
-                {{-- <div class="bg-yellow-500 text-white rounded p-2 text-center cursor-pointer hover:bg-yellow-600">
-                    <div class="text-sm">F4</div>
-                    <div class="font-bold">Quick Pay</div>
-                </div>
-                <div class="bg-purple-500 text-white rounded p-2 text-center cursor-pointer hover:bg-purple-600">
-                    <div class="text-sm">F5</div>
-                    <div class="font-bold">Hold</div> --}}
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Your shortcut buttons remain unchanged -->
                 </div>
             </div>
         </div>

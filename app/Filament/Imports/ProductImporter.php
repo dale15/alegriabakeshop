@@ -28,7 +28,7 @@ class ProductImporter extends Importer
         $category = Category::firstOrCreate([
             'name' => $this->data['category_name'],
         ], [
-            'description' => '',
+            'description' => $this->data['description'] ?? null,
         ]);
 
         return Product::firstOrNew([
