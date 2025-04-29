@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pos;
 
+use App\Models\Discount;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Livewire\Component;
@@ -17,6 +18,11 @@ class CheckoutComponent extends Component
     public $showCheckoutModal = false;
     public $checkAmountTendered = 0;
 
+    // Discounts
+    public ?int $selectedDiscountId = null;
+    public float $discountAmount = 0;
+    public float $totalAfterDiscount = 0;
+
     protected $listeners = [
         'cartUpdated',
         'resetCheckoutBtn' => 'resetCheckout',
@@ -31,15 +37,26 @@ class CheckoutComponent extends Component
     {
         $this->calculateChange();
 
-        if ($this->amountTendered < $this->total) {
-            session()->flash('error', 'You give an insufficient cash.');
-            return;
+        if ($this->discountAmount == 0) {
+            if ($this->amountTendered < $this->total) {
+                session()->flash('error', 'You give an insufficient cash.');
+                return;
+            }
+        } else {
+            if ($this->amountTendered < $this->totalAfterDiscount) {
+                session()->flash('error', 'You give an insufficient cash.');
+                return;
+            }
         }
     }
 
     public function calculateChange()
     {
-        $total = $this->calculateTotal();
+        if ($this->discountAmount == 0) {
+            $total = $this->total;
+        } else {
+            $total = $this->totalAfterDiscount;
+        }
         $this->checkAmountTendered = $this->amountTendered;
 
         $this->change = max(0, $this->amountTendered - $total);
@@ -56,10 +73,39 @@ class CheckoutComponent extends Component
         return $subtotal;
     }
 
+    public function updatedSelectedDiscountId($id)
+    {
+        $discount = Discount::find($id);
+        $this->dispatch('updateAppliedDiscount', $id);
+
+        if (!$discount) {
+            $this->discountAmount = 0;
+            $this->calculateChange();
+            return;
+        }
+
+        $subtotal = $this->calculateTotal();
+
+        if ($discount->type === 'amount') {
+            $this->discountAmount = $discount->value;
+        } elseif ($discount->type === 'percent') {
+            $this->discountAmount = ($discount->value / 100) * $subtotal;
+        }
+
+        $this->totalAfterDiscount = $subtotal - $this->discountAmount;
+        $this->calculateChange();
+    }
+
     public function completeCheckout()
     {
-        $this->dispatch('updateAmountTendered', $this->amountTendered);
-        $this->showCheckoutModal = false;
+        if ($this->amountTendered < $this->total) {
+            $this->dispatch('insuf-cash', 'You give an insufficient cash!.');
+        } else {
+            $this->dispatch('updateAmountTendered', $this->amountTendered);
+            $this->selectedDiscountId = 0;
+            $this->discountAmount = 0;
+            $this->showCheckoutModal = false;
+        }
     }
 
     public function confirmCheckout()
@@ -69,6 +115,8 @@ class CheckoutComponent extends Component
         if (!empty($cartItems)) {
             $this->showCheckoutModal = true;
             $this->total = $this->calculateTotal();
+            $this->amountTendered = $this->total;
+            $this->checkAmountTendered = $this->amountTendered;
         } else {
             $this->dispatch('cart-empty', 'Your cart is empty. Please add items before checkout.');
         }
@@ -145,6 +193,12 @@ class CheckoutComponent extends Component
     public function closeModal()
     {
         $this->showCheckoutModal = false;
+
+        $this->checkAmountTendered = 0;
+        $this->selectedDiscountId = 0;
+        $this->discountAmount = 0;
+        $this->change = 0;
+        $this->dispatch('updateAppliedDiscount', 0);
     }
 
     public function render()

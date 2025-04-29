@@ -21,6 +21,8 @@ class Products extends Component
     public $boxTotal = 0;
     public $selectedBoxProduct;
 
+    public $boxItems = [];
+
     protected $listeners = ['categorySelected', 'searchUpdated'];
 
     public function categorySelected($categoryId)
@@ -39,6 +41,8 @@ class Products extends Component
 
                 preg_match('/\d+/', $product->name, $matches);
                 $this->boxItemLimit = !empty($matches) ? (int)$matches[0] : 6;
+
+                $this->boxItems = Product::whereIn('id', $product->allowed_items_ids ?? [])->get();
 
                 $this->showBoxModal = true;
             } else {
@@ -82,6 +86,7 @@ class Products extends Component
                     'selling_price' => $product->selling_price,
                     'image_url' => $product->image_url,
                     'quantity' => 1, // New quantity property
+                    
                 ];
             }
         }
@@ -185,10 +190,13 @@ class Products extends Component
         $boxProduct = Product::where('is_box', false)->get();
 
         if ($this->showBoxModal) {
-            $query = Product::where('is_box', false)
-                ->where('id', $this->selectedBoxProduct);
+            // $query = Product::where('is_box', false)
+            //     ->where('id', $this->selectedBoxProduct);
 
-            $availableBoxProducts = $query->get();
+            // $availableBoxProducts = $query->get();
+
+            $box = Product::find($this->selectedBoxProduct);
+            $availableBoxProducts = Product::whereIn('id', $box->allowed_items_ids ?? [])->get();
         }
 
         return view('livewire.pos.products', [

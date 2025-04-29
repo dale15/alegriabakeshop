@@ -2,9 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\SalesChart;
-use App\Filament\Widgets\SalesOverviewChartWidget;
-use App\Filament\Widgets\SalesPerProductChart;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Filament\Forms\Components\DatePicker;
@@ -15,7 +12,6 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -64,9 +60,10 @@ class SalesOverview extends Page implements HasTable
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
-                ])
+            ])
             ->filtersFormColumns(2)
             ->columns([
+                TextColumn::make('sales_id'),
                 TextColumn::make('total_amount')
                     ->label('Total Amount')
                     ->money('PHP'),
@@ -87,13 +84,13 @@ class SalesOverview extends Page implements HasTable
             ], ActionsPosition::BeforeCells);
     }
 
-    protected function getFooterWidgets(): array
-    {
-        return [
-            SalesChart::class,
-            SalesPerProductChart::class
-        ];
-    }
+    // protected function getFooterWidgets(): array
+    // {
+    //     return [
+    //         SalesChart::class,
+    //         SalesPerProductChart::class
+    //     ];
+    // }
 
     public function getFooterWidgetsColumns(): array|int|string
     {

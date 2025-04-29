@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pos;
 
+use App\Models\Discount;
 use Livewire\Component;
 
 class CartComponent extends Component
@@ -14,12 +15,20 @@ class CartComponent extends Component
     public $total = 0;
     public $change = 0;
 
+    // Discounts
+    public ?int $selectedDiscountId = null;
+    public float $discountAmount = 0;
+    public float $totalAfterDiscount = 0;
+    public string $discountType = '';
+    public int $discountValue = 0;
+
     protected $listeners = [
         'addToCart',
         'removeFromCart',
         'clearCart',
         'updateCartItemQuantity',
         'updateAmountTendered' => 'setAmountTendered',
+        'updateAppliedDiscount' => 'setDiscount',
     ];
 
     public function mount()
@@ -31,7 +40,22 @@ class CartComponent extends Component
     public function setAmountTendered($amount)
     {
         $this->amountTendered = $amount;
-        $this->change = $this->amountTendered - $this->subtotal;
+        $this->calculateTotals();
+    }
+
+    public function setDiscount($id)
+    {
+        $discount = Discount::find($id);
+
+        if (!$discount) {
+            $this->discountAmount = 0;
+            return;
+        }
+
+        $this->discountType = $discount->type;
+        $this->discountValue = $discount->value;
+
+        $this->calculateTotals();
     }
 
     public function addToCart($product)
@@ -62,6 +86,8 @@ class CartComponent extends Component
 
             $this->amountTendered = 0;
             $this->change = 0;
+            $this->discountAmount = 0;
+            $this->discountValue = 0;
             $this->dispatch('resetCheckoutBtn');
 
             $this->saveCart();
@@ -83,6 +109,8 @@ class CartComponent extends Component
         $this->cartItems = [];
         $this->amountTendered = 0;
         $this->change = 0;
+        $this->discountAmount = 0;
+        $this->discountValue = 0;
         $this->dispatch('resetCheckoutBtn');
 
         $this->saveCart();
@@ -95,7 +123,19 @@ class CartComponent extends Component
             return $item['price'] * $item['quantity'];
         });
 
-        $this->total = $this->subtotal;
+        if ($this->discountType === 'amount') {
+            $this->discountAmount = $this->discountValue;
+        } elseif ($this->discountType === 'percent') {
+            $this->discountAmount = ($this->discountValue / 100) * $this->subtotal;
+        }
+
+        if ($this->discountAmount == 0) {
+            $this->total = $this->subtotal;
+            $this->change = $this->amountTendered - $this->total;
+        } else {
+            $this->totalAfterDiscount = $this->subtotal - $this->discountAmount;
+            $this->change = $this->amountTendered - $this->totalAfterDiscount;
+        }
     }
 
     public function saveCart()

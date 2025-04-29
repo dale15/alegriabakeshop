@@ -79,15 +79,23 @@
                 <span class="text-gray-600">Subtotal</span>
                 <span>Php {{ number_format($subtotal, 2) }}</span>
             </div>
-            {{-- <div class="flex justify-between">
-                <span class="text-gray-600">Tax (10%):</span>
-                <span>${{ number_format($tax, 2) }}</span>
-            </div> --}}
 
-            <div class="flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span>Php {{ number_format($total, 2) }}</span>
-            </div>
+            @if ($discountAmount == 0)
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span>Php {{ number_format($total, 2) }}</span>
+                </div>
+            @else
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Discount:</span>
+                    <span>Php {{ number_format($discountAmount, 2) }}</span>
+                </div>
+
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span>Php {{ number_format($totalAfterDiscount, 2) }}</span>
+                </div>
+            @endif
 
             @if ($amountTendered > 0)
                 <div class="flex justify-between mt-4">

@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $casts = ['is_box' => 'boolean'];
+    protected $casts = [
+        'is_box' => 'boolean',
+        'allowed_items_ids' => 'array',
+    ];
 
-    protected $fillable = ['name', 'category_id', 'cost_price', 'selling_price', 'image_url', 'is_box'];
+    protected $fillable = ['name', 'category_id', 'cost_price', 'selling_price', 'image_url', 'is_box', 'sku', 'allowed_items_ids'];
 
 
     public function category()
@@ -36,6 +39,11 @@ class Product extends Model
         return $this->productIngredients->sum(function ($costing) {
             return $costing->quantity * $costing->ingredient->cost_per_unit;
         });
+    }
+
+    public function getAllowedItemsAttribute()
+    {
+        return Product::whereIn('id', $this->allowed_item_ids ?? [])->get();
     }
 
     // public static function boot()

@@ -33,14 +33,37 @@
             <div class="p-4 bg-white rounded shadow w-[500px]">
                 <h2 class="text-lg font-semibold">Checkout</h2>
 
-                <div class="mt-4">
-                    <label class="block">Total: <strong>Php {{ number_format($total, 2) }}</strong></label>
+                <div class="mt-4 flex items-center space-x-2">
+                    <label for="amountTendered" class="block">Apply Discounts:</label>
+                    <select wire:model.live="selectedDiscountId" class="p-2 border rounded">
+                        <option value="0">No Discount</option>
+                        @foreach (\App\Models\Discount::where('is_active', true)->get() as $discount)
+                            <option value="{{ $discount->id }}">
+                                {{ $discount->name }} -
+                                {{ $discount->type === 'percent' ? $discount->value . '%' : '₱' . number_format($discount->value, 2) }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div class="mt-4">
+                <div class="mt-4 flex items-center space-x-2">
                     <label for="amountTendered" class="block">Amount Tendered:</label>
-                    <input type="number" wire:model.live="amountTendered" class="w-full p-2 border rounded" />
+                    <input type="number" wire:model.live="amountTendered" class="p-2 border rounded" />
                 </div>
+
+                @if ($discountAmount != 0)
+                    <div class="mt-4">
+                        <label class="block">Discount: <strong>Php {{ number_format($discountAmount, 2) }}</strong></label>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block">Total: <strong>Php {{ number_format($totalAfterDiscount, 2) }}</strong></label>
+                    </div>
+                @else
+                    <div class="mt-4">
+                        <label class="block">Total: <strong>Php {{ number_format($total, 2) }}</strong></label>
+                    </div>
+                @endif
 
                 <div class="mt-4">
                     <label class="block">Change: <strong>Php {{ number_format($change, 2) }}</strong></label>
@@ -60,6 +83,7 @@
                 @if (session()->has('success'))
                     <p class="text-green-600">{{ session('success') }}</p>
                 @endif
+
             </div>
         </div>
     @endif
@@ -90,6 +114,14 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Insufficient stock',
+                    text: message,
+                });
+            });
+
+            Livewire.on('insuf-cash', message => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Insufficient Cash',
                     text: message,
                 });
             });

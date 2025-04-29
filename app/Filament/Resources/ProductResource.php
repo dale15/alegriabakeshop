@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\ProductIngredientRelationManager;
 use App\Models\Product;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -38,7 +39,6 @@ class ProductResource extends Resource
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')->label('Product Name')->required(),
-                        TextInput::make('selling_price')->label('Selling Price')->numeric()->required(),
                         Select::make('category_id')->relationship('category', 'name')
                             ->createOptionForm([
                                 TextInput::make('name')->label('Category Name')
@@ -53,16 +53,26 @@ class ProductResource extends Resource
                                             ->send();
                                     });
                             }),
+                        TextInput::make('selling_price')->label('Selling Price')->numeric()->required(),
                         TextInput::make('cost_price')->label('Cost')->numeric(),
-                        Toggle::make('is_box')->label('Box'),
+                        TextInput::make('sku')->label('SKU'),
+
                     ])->columnSpan(2)->columns(2),
-                Section::make('Image')
+                Section::make('Meta')
                     ->collapsible()
                     ->schema([
                         FileUpload::make('image_url')
                             ->label('Image Upload')
                             ->directory('uploads')
                             ->preserveFilenames(),
+                        Toggle::make('is_box')->label('Box')->reactive(),
+                        Select::make('allowed_items_ids')
+                            ->label('Allowed Products in Box')
+                            ->multiple()
+                            ->options(fn() => Product::where('is_box', false)->pluck('name', 'id'))
+                            ->visible(fn(Get $get) => $get('is_box') === true)
+                            ->searchable()
+                            ->preload(),
                     ])->columnSpan(1),
 
             ])->columns(3);
@@ -80,12 +90,27 @@ class ProductResource extends Resource
                     ->label('Product')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('sku')
+                    ->sortable()
+                    ->placeholder('N/A'),
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable()
                     ->placeholder('No Category yet.'),
+                Tables\Columns\TextColumn::make('cost_price')
+                    ->numeric(decimalPlaces: 2)
+                    ->money('PHP'),
                 Tables\Columns\TextColumn::make('selling_price')
                     ->numeric(decimalPlaces: 2)
                     ->money('PHP'),
+                Tables\Columns\TextColumn::make('margin %')
+                    ->label('Margin')
+                    ->getStateUsing(function ($record) {
+                        if ($record->selling_price == 0) {
+                            return '0%';
+                        }
+                        $margin = (($record->selling_price - $record->cost_price) / $record->selling_price) * 100;
+                        return number_format($margin, 2) . '%';
+                    }),
                 TextColumn::make('is_box')
                     ->label('Product Type')
                     ->badge()

@@ -63,24 +63,31 @@
                         <p class="text-sm text-gray-500">Select exactly {{ $boxItemLimit }} items to complete your box</p>
                     </div>
 
-                    <select wire:model.live="selectedBoxProduct"
+                    {{-- <select wire:model.live="selectedBoxProduct"
                         class="px-4 py-2 mt-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select a product</option>
                         @foreach ($boxProducts as $product)
-                            <option value="{{ $product->id }}"> {{ $product->name }} </option>
+                        <option value="{{ $product->id }}"> {{ $product->name }} </option>
                         @endforeach
-                    </select>
+                    </select> --}}
+
+                    @if (session()->has('warningLimit'))
+                        <div class="bg-red-500 text-white px-4 py-2 rounded-md mb-2 mt-4">
+                            {{ session('warningLimit') }}
+                        </div>
+                    @endif
                 </div>
 
-                <div class="p-6 overflow-y-auto flex">
-                    <div class="flex flex-wrap justify-center">
-                        @foreach ($availableBoxProducts as $product)
-                            <div wire:key="box-item-{{ $product->id }}"
-                                class="bg-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow {{ $this->isBoxItemSelected($product->id) ? 'border-blue-500 ring-2 ring-blue-300' : '' }}">
 
-                                <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden p-4">
-                                    @if($product->image_url)
-                                        <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}"
+                <div class="p-4 overflow-y-auto ">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach ($boxItems as $items)
+                            <div wire:key="box-item-{{ $items->id }}"
+                                class="bg-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+
+                                <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden p-2">
+                                    @if($items->image_url)
+                                        <img src="{{ asset('storage/' . $items->image_url) }}" alt="{{ $items->name }}"
                                             class="w-full h-24 object-cover">
                                     @else
                                         <div class="w-full h-24 flex items-center justify-center bg-gray-200">
@@ -95,14 +102,14 @@
 
                                 <hr class="ml-4 me-4">
 
-                                <div class="flex justify-between p-3 bg-gray-200">
-                                    <h3 class="text-sm font-medium truncate">{{ $product->name }} </h3>
+                                <div class="flex justify-between p-4 bg-gray-200">
+                                    <h3 class="text-sm font-medium truncate">{{ $items->name }} </h3>
                                     <div class="flex justify-between items-center mt-1">
                                         {{-- <p class="text-sm font-bold">Php {{ number_format($product->selling_price, 2) }}
                                         </p> --}}
 
                                         <!-- Decrease quantity -->
-                                        <button wire:click="decreaseBoxItemQuantity({{ $product['id'] }})"
+                                        <button wire:click="decreaseBoxItemQuantity({{ $items['id'] }})"
                                             class="ml-2 text-gray-500 hover:text-gray-700 cursor-pointer">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20"
                                                 fill="currentColor">
@@ -112,7 +119,7 @@
                                         </button>
 
                                         <!-- Increase quantity -->
-                                        <button wire:click="toggleBoxItem({{ $product['id'] }})"
+                                        <button wire:click="toggleBoxItem({{ $items['id'] }})"
                                             class="ml-2 text-green-500 hover:text-green-700 cursor-pointer">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20"
                                                 fill="currentColor">
@@ -121,20 +128,11 @@
                                                     clip-rule="evenodd" />
                                             </svg>
                                         </button>
-
                                     </div>
                                 </div>
-
                             </div>
                         @endforeach
                     </div>
-                </div>
-
-                <div class="mt-2 p-4">
-                    <p class="text-sm font-medium">Notes</p>
-                    <textarea wire:model="notes"
-                        class="px-4 py-2 mt-4 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Add some notes"></textarea>
                 </div>
 
                 <div class="px-6 py-3">
@@ -155,12 +153,13 @@
                             </div>
                         @endforeach
                     </div>
+                </div>
 
-                    @if (session()->has('warningLimit'))
-                        <div class="bg-red-500 text-white px-4 py-2 rounded-md mb-2 mt-4">
-                            {{ session('warningLimit') }}
-                        </div>
-                    @endif
+                <div class="mt-2 p-4">
+                    <p class="text-sm font-medium">Notes</p>
+                    <textarea wire:model="notes"
+                        class="px-4 py-2 mt-4 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Add some notes"></textarea>
                 </div>
 
                 <div class="px-6 py-4 border-t bg-gray-50">
