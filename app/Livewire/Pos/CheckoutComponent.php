@@ -143,7 +143,9 @@ class CheckoutComponent extends Component
                     'product_id' => $item['id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
+                    'cost_price' => $item['cost_price'],
                     'total' => $item['price'] * $item['quantity'],
+                    'total_cost_price' => $item['cost_price'] * $item['quantity'],
                 ]);
 
                 // Deduce stock 

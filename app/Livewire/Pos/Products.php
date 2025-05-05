@@ -49,6 +49,7 @@ class Products extends Component
                 $this->dispatch('addToCart', [
                     'id' => $product->id,
                     'name' => $product->name,
+                    'cost_price' => $product->cost_price,
                     'selling_price' => $product->selling_price,
                     'image_url' => $product->image_url,
                 ]);
@@ -86,7 +87,7 @@ class Products extends Component
                     'selling_price' => $product->selling_price,
                     'image_url' => $product->image_url,
                     'quantity' => 1, // New quantity property
-                    
+
                 ];
             }
         }
@@ -155,6 +156,7 @@ class Products extends Component
         $this->dispatch('addToCart', [
             'id' => $this->selectedProduct->id,
             'name' => $this->selectedProduct->name,
+            'cost_price' => $this->selectedProduct->cost_price,
             'selling_price' => $this->selectedProduct->selling_price,
             'image_url' => $this->selectedProduct->image_url,
             'boxItems' => $this->selectedBoxItems,

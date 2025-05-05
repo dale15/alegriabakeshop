@@ -13,7 +13,7 @@ class Sale extends Model
         static::creating(function ($sale) {
             $date = now()->format('Ymd');
             $countToday = self::whereDate('created_at', now())->count() + 1;
-            $sale->sales_id = 'ALGR-' . $date . '-' . str_pad($countToday, 4, '0', STR_PAD_LEFT);
+            $sale->sales_id = $date . '-' . str_pad($countToday, 4, '0', STR_PAD_LEFT);
         });
     }
 

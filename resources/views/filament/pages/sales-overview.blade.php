@@ -47,4 +47,8 @@
             </div>
         </div>
     </div>
+
+    <div>
+        {{-- {{ $this->salesItemsTable }} --}}
+    </div>
 </x-filament-panels::page>

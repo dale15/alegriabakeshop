@@ -69,6 +69,7 @@ class CartComponent extends Component
                 'id' => $productId,
                 'name' => $product['name'],
                 'price' => $product['selling_price'],
+                'cost_price' => $product['cost_price'],
                 'quantity' => 1,
                 'image' => $product['image_url'] ?? null,
                 'boxItems' => $product['boxItems'] ?? null,

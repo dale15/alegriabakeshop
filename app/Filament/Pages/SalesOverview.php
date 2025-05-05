@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\InventoryTableWidget;
+use App\Filament\Widgets\SalesReportTable;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Filament\Forms\Components\DatePicker;
@@ -84,16 +86,15 @@ class SalesOverview extends Page implements HasTable
             ], ActionsPosition::BeforeCells);
     }
 
-    // protected function getFooterWidgets(): array
-    // {
-    //     return [
-    //         SalesChart::class,
-    //         SalesPerProductChart::class
-    //     ];
-    // }
+    protected function getFooterWidgets(): array
+    {
+        return [
+            SalesReportTable::class,
+        ];
+    }
 
     public function getFooterWidgetsColumns(): array|int|string
     {
-        return 2;
+        return 1;
     }
 }
