@@ -36,6 +36,7 @@ class ProductImporter extends Importer
             'name' => $this->data['name'],
         ], [
             'name' => $this->data['name'],
+            'sku' => $this->data['sku'],
             'category_id' => $category->id,
             'selling_price' => $this->data['selling_price'],
             'cost_price' => $this->data['cost_price'],
