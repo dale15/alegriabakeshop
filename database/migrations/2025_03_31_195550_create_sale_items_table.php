@@ -17,8 +17,10 @@ return new class extends Migration
             $table->foreignId('product_variant_id')->nullable()->constrained(); // -- Link to the variant
             $table->foreignId('product_id')->constrained(); // -- Link to the Flavor (product)
             $table->integer('quantity'); // -- Quantity of the selected flavor (product)
+            $table->decimal('cost_price', 10, 2); // -- Cost Price of goods
             $table->decimal('price', 10, 2); // -- Price at the time of sale
             $table->decimal('total', 10, 2); // -- price * quantity
+            $table->decimal('total_cost_price', 10, 2); // -- cost price * quantity
             $table->timestamps();
         });
     }
