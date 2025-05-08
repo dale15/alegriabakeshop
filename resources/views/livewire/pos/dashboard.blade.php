@@ -32,12 +32,15 @@
         <div class="sticky top-4 space-y-6">
             <livewire:pos.cart-component />
             <livewire:pos.checkout-component />
-
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="grid grid-cols-2 gap-2">
-                    <!-- Your shortcut buttons remain unchanged -->
-                </div>
-            </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        Livewire.on('saleCompleted', saleId => {
+            const url = '/receipt/${saleId}';
+            window.open(url, '_blank');
+        });
+    </script>
+@endpush
