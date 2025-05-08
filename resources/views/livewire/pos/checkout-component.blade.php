@@ -87,6 +87,15 @@
             </div>
         </div>
     @endif
+
+    @if($saleId)
+        <!-- Your shortcut buttons remain unchanged -->
+        <button wire:click="printReceipt"
+            class="bg-green-500 text-white py-2 px-4 mt-4 rounded hover:bg-blue-600 w-full cursor-pointer">
+            Print Receipt
+        </button>
+    @endif
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

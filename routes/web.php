@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Pos\Dashboard;
+use App\Livewire\Pos\MyReceipt;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -9,3 +10,4 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', Dashboard::class)->name('pos');
+Route::get('/receipt/{saleId}', MyReceipt::class)->name('receipt');

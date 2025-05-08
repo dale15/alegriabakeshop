@@ -129,7 +129,12 @@ class CheckoutComponent extends Component
         try {
             DB::beginTransaction();
 
+            $date = now()->format('Ymd');
+            $countToday = Sale::whereDate('created_at', now()->toDateString())->count() + 1;
+            $saleId = $date . '-' . str_pad($countToday, 4, '0', STR_PAD_LEFT);
+
             $sale = Sale::create([
+                'sales_id' => $saleId,
                 'total_amount' => $this->total,
                 'payment_method' => 'cash',
                 'amount_tendered' => $this->amountTendered,
@@ -201,6 +206,15 @@ class CheckoutComponent extends Component
         $this->discountAmount = 0;
         $this->change = 0;
         $this->dispatch('updateAppliedDiscount', 0);
+    }
+
+    public function printReceipt()
+    {
+        $sale = Sale::find($this->saleId);
+
+        if ($sale) {
+            return redirect()->route('receipt', $this->saleId);
+        }
     }
 
     public function render()

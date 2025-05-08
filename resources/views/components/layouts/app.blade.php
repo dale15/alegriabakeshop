@@ -10,11 +10,23 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+
+    <style>
+        @media print {
+
+            .app-header,
+            .app-footer,
+            .app-buttons {
+                display: none !important;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="bg-[#FDFDFC] text-[#1b1b18]">
 
-    <header class="bg-black text-white shadow-md">
+    <header class="bg-black text-white shadow-md app-header">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
 
@@ -72,7 +84,7 @@
         {{ $slot }}
     </main>
 
-    <footer class="bg-gray-200 shadow-sm">
+    <footer class="bg-gray-200 shadow-sm app-footer">
         <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
             <img class="w-24 h-24" src="{{ asset('images/cajidatech.png') }}" />
 

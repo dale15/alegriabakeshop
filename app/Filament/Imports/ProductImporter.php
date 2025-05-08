@@ -16,6 +16,7 @@ class ProductImporter extends Importer
     {
         return [
             ImportColumn::make('name'),
+            ImportColumn::make('sku')->label('SKU'),
             ImportColumn::make('category_name')->label('Category'),
             ImportColumn::make('cost_price'),
             ImportColumn::make('selling_price'),
