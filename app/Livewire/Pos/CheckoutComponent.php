@@ -37,13 +37,15 @@ class CheckoutComponent extends Component
     {
         $this->calculateChange();
 
+        $tendered = floatval($this->amountTendered);
+
         if ($this->discountAmount == 0) {
-            if ($this->amountTendered < $this->total) {
+            if ($tendered < $this->total) {
                 session()->flash('error', 'You give an insufficient cash.');
                 return;
             }
         } else {
-            if ($this->amountTendered < $this->totalAfterDiscount) {
+            if ($tendered < $this->totalAfterDiscount) {
                 session()->flash('error', 'You give an insufficient cash.');
                 return;
             }
@@ -52,14 +54,16 @@ class CheckoutComponent extends Component
 
     public function calculateChange()
     {
+        $tendered = floatval($this->amountTendered);
+
         if ($this->discountAmount == 0) {
             $total = $this->total;
         } else {
             $total = $this->totalAfterDiscount;
         }
-        $this->checkAmountTendered = $this->amountTendered;
+        $this->checkAmountTendered = $tendered;
 
-        $this->change = max(0, $this->amountTendered - $total);
+        $this->change = max(0, $tendered - $total);
     }
 
     public function calculateTotal()
