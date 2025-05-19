@@ -27,9 +27,13 @@ class DiscountController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Discount $discount)
     {
-        //
+        return response()->json([
+            'status' => true,
+            'message' => 'Discount Found',
+            'data' => $discount
+        ]);
     }
 
     /**

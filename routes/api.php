@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ProductController;
 Route::apiResource('products', ProductController::class);
 Route::apiResource('category', CategoryController::class);
 Route::apiResource('sales', SalesController::class);
-Route::apiResource('discount', DiscountController::class);
+Route::apiResource('discounts', DiscountController::class);
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();

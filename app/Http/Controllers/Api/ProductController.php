@@ -58,7 +58,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->validate([
+            'name' => "required|string|max:255",
+        ]);
+
+        $product = Product::findOrFail($id);
+
+        $product->update($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product Updated Successfully',
+            'data' => $product,
+        ]);
     }
 
     /**
