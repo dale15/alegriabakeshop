@@ -60,6 +60,8 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => "required|string|max:255",
+            'selling_price' => "required",
+            'cost_price' => "required",
         ]);
 
         $product = Product::findOrFail($id);
