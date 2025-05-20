@@ -41,7 +41,21 @@ class DiscountController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->validate([
+            'name' => "required|string|max:255",
+            'value' => "required",
+            'is_active' => "required",
+        ]);
+
+        $discount = Discount::findOrFail($id);
+
+        $discount->update($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Discounts Updated Successfully',
+            'data' => $discount,
+        ]);
     }
 
     /**
