@@ -31,10 +31,6 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => "required",
-            'selling_price' => 'required|numeric',
-            'cost_price' => 'required|numeric',
-            'modifiers' => 'nullable|array',
-
         ]);
 
         Product::create($data);
@@ -66,6 +62,7 @@ class ProductController extends Controller
             'name' => "required|string|max:255",
             'selling_price' => "required",
             'cost_price' => "required",
+            'modifiers' => 'nullable|array'
         ]);
 
         $product = Product::findOrFail($id);
