@@ -31,6 +31,10 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => "required",
+            'selling_price' => 'required|numeric',
+            'cost_price' => 'required|numeric',
+            'modifiers' => 'nullable|array',
+
         ]);
 
         Product::create($data);
