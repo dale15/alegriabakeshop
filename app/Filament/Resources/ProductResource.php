@@ -7,6 +7,8 @@ use App\Filament\Resources\ProductResource\RelationManagers\ProductIngredientRel
 use App\Models\Product;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -56,6 +58,11 @@ class ProductResource extends Resource
                         TextInput::make('selling_price')->label('Selling Price')->numeric()->required(),
                         TextInput::make('cost_price')->label('Cost')->numeric(),
                         TextInput::make('sku')->label('SKU'),
+                        KeyValue::make('modifiers')
+                            ->label('Size Price Modifiers')
+                            ->keyLabel('Size')
+                            ->valueLabel('Price')
+                            ->addActionLabel('Add Size'),
 
                     ])->columnSpan(2)->columns(2),
                 Section::make('Meta')

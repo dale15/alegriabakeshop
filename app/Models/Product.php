@@ -9,9 +9,10 @@ class Product extends Model
     protected $casts = [
         'is_box' => 'boolean',
         'allowed_items_ids' => 'array',
+        'modifiers' => 'array',
     ];
 
-    protected $fillable = ['name', 'category_id', 'cost_price', 'selling_price', 'image_url', 'is_box', 'sku', 'allowed_items_ids'];
+    protected $fillable = ['name', 'category_id', 'cost_price', 'selling_price', 'image_url', 'is_box', 'sku', 'allowed_items_ids', 'modifiers'];
 
 
     public function category()
