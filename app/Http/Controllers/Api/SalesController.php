@@ -32,6 +32,7 @@ class SalesController extends Controller
             "change" => "required|numeric|min:0",
             "status" => "required|string",
             "cartItem" => "required|array",
+            "total_discount" => "required|numeric|min:0",
         ]);
 
         $data['sales_id'] = $saleId;
