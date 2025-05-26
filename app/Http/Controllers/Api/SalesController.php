@@ -14,7 +14,7 @@ class SalesController extends Controller
      */
     public function index()
     {
-        return response()->json(Sale::all());
+        return response()->json(Sale::with('saleItems.product')->get());
     }
 
     /**
