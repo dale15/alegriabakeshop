@@ -66,6 +66,14 @@ class SalesOverview extends Page implements HasTable
             ->filtersFormColumns(2)
             ->columns([
                 TextColumn::make('sales_id'),
+                TextColumn::make('discount_name')
+                    ->label('Discount')
+                    ->formatStateUsing(fn($state) => $state ?: 'No Discount')
+                    ->placeholder('No Discount'),
+                TextColumn::make('total_discount')
+                    ->label('Total Discount')
+                    ->formatStateUsing(fn($state) => $state !== null ? '₱' . number_format($state, 2) : '₱0.00')
+                    ->placeholder('₱0.00'),
                 TextColumn::make('total_amount')
                     ->label('Total Amount')
                     ->money('PHP'),
