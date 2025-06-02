@@ -32,7 +32,7 @@ class SalesController extends Controller
             "change" => "required|numeric|min:0",
             "status" => "required|string",
             "cartItem" => "required|array",
-            "discount_name" => "required|string",
+            "discount_name" => "string",
             "total_discount" => "required|numeric|min:0",
         ]);
 
