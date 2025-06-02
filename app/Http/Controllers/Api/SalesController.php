@@ -32,6 +32,7 @@ class SalesController extends Controller
             "change" => "required|numeric|min:0",
             "status" => "required|string",
             "cartItem" => "required|array",
+            "discount_name" => "required|string",
             "total_discount" => "required|numeric|min:0",
         ]);
 
@@ -43,6 +44,7 @@ class SalesController extends Controller
             'payment_method' => 'cash',
             'amount_tendered' => $data['amount_tendered'],
             'change' => $data['change'],
+            'discount_name' => $data['discount_name'],
             'total_discount' => $data['total_discount'],
             'status' => 'completed'
         ]);
