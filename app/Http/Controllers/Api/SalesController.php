@@ -43,7 +43,6 @@ class SalesController extends Controller
             'payment_method' => 'cash',
             'amount_tendered' => $data['amount_tendered'],
             'change' => $data['change'],
-            'discount_name' => $data['discount_name'],
             'total_discount' => $data['total_discount'],
             'status' => 'completed'
         ]);
