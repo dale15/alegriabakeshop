@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Exports\SaleItemsReportExport;
 use App\Models\SaleItem;
-use Filament\Forms\Components\Checkbox;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;

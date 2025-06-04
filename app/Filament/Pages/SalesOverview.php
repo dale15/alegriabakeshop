@@ -2,8 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\InventoryTableWidget;
-use App\Filament\Widgets\SalesReportTable;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Filament\Forms\Components\DatePicker;
@@ -16,6 +14,8 @@ use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
+
 
 class SalesOverview extends Page implements HasTable
 {
@@ -25,17 +25,27 @@ class SalesOverview extends Page implements HasTable
 
     protected static string $view = 'filament.pages.sales-overview';
 
+
     public $selectedSaleId;
+    public $showModal;
     public $saleItems = [];
+
 
     public function mount()
     {
         $this->selectedSaleId = null;
+        $this->showModal = false;
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('');
     }
 
     public function loadSaleItems($saleId)
     {
         $this->selectedSaleId = $saleId;
+        $this->showModal = true;
         $this->saleItems = SaleItem::where('sale_id', $saleId)->get();
     }
 
@@ -94,15 +104,8 @@ class SalesOverview extends Page implements HasTable
             ], ActionsPosition::BeforeCells);
     }
 
-    protected function getFooterWidgets(): array
+    public static function shouldRegisterNavigation(): bool
     {
-        return [
-            SalesReportTable::class,
-        ];
-    }
-
-    public function getFooterWidgetsColumns(): array|int|string
-    {
-        return 1;
+        return false;
     }
 }
