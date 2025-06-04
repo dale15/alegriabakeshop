@@ -24,7 +24,8 @@ class ProductSalesReportWidget extends BaseWidget
                 SUM(total_cost_price) as total_cost,
                 SUM(total) - SUM(cost_price) as gross_profit')
             ->with('product')
-            ->groupBy('product_id');
+            ->groupBy('product_id')
+            ->orderByRaw('MIN(id) ASC');
     }
 
     public function table(Table $table): Table
