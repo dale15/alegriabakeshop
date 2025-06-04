@@ -12,6 +12,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class SalesReportTable extends BaseWidget
 {
@@ -70,16 +71,23 @@ class SalesReportTable extends BaseWidget
 
     protected function getGroupedSalesQuery(): Builder
     {
-        // Create a subquery as a fake Eloquent model
+        $discountSubquery = DB::table('sales')
+            ->selectRaw('DATE(created_at) as sale_date, SUM(total_discount) as total_discount')
+            ->groupByRaw('DATE(created_at)');
+
         return SaleItem::query()
-            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')  // join sales table
-            ->selectRaw('DATE(sale_items.created_at) as sale_date, 
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->joinSub($discountSubquery, 'daily_discounts', function ($join) {
+                $join->on(DB::raw('DATE(sale_items.created_at)'), '=', 'daily_discounts.sale_date');
+            })
+            ->selectRaw('
+                DATE(sale_items.created_at) as sale_date,
                 SUM(sale_items.total) as total_sales,
                 SUM(sale_items.total_cost_price) as cost_price,
-                SUM(sales.total_discount) as total_discount,
-                SUM(sale_items.total) - SUM(total_cost_price) - SUM(sales.total_discount) as gross_profit
-                ')
-            ->groupByRaw('DATE(sale_items.created_at)')
+                daily_discounts.total_discount,
+                SUM(sale_items.total) - SUM(sale_items.total_cost_price) - daily_discounts.total_discount as gross_profit
+            ')
+            ->groupByRaw('DATE(sale_items.created_at), daily_discounts.total_discount')
             ->orderByRaw('DATE(sale_items.created_at) DESC');
     }
 
