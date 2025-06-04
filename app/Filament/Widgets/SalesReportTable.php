@@ -33,11 +33,11 @@ class SalesReportTable extends BaseWidget
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('sale_items.created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_at'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('sale_items.created_at', '<=', $date),
                             );
                     }),
 
@@ -53,8 +53,11 @@ class SalesReportTable extends BaseWidget
                 TextColumn::make('cost_price')
                     ->label('Cost of Goods')
                     ->money('PHP'),
+                TextColumn::make('total_discount')
+                    ->label('Total Discount')
+                    ->money('PHP'),
                 TextColumn::make('gross_profit')
-                    ->label('Gross Profit')
+                    ->label('Net Sales')
                     ->money('PHP'),
             ])
             ->headerActions([
@@ -69,12 +72,15 @@ class SalesReportTable extends BaseWidget
     {
         // Create a subquery as a fake Eloquent model
         return SaleItem::query()
-            ->selectRaw('DATE(created_at) as sale_date, 
-                SUM(total) as total_sales,
-                SUM(cost_price) as cost_price,
-                SUM(total) - SUM(cost_price) as gross_profit')
-            ->groupByRaw('DATE(created_at)')
-            ->orderByRaw('DATE(created_at) DESC');
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')  // join sales table
+            ->selectRaw('DATE(sale_items.created_at) as sale_date, 
+                SUM(sale_items.total) as total_sales,
+                SUM(sale_items.total_cost_price) as cost_price,
+                SUM(sales.total_discount) as total_discount,
+                SUM(sale_items.total) - SUM(total_cost_price) - SUM(sales.total_discount) as gross_profit
+                ')
+            ->groupByRaw('DATE(sale_items.created_at)')
+            ->orderByRaw('DATE(sale_items.created_at) DESC');
     }
 
     public function getTableRecordKey($record): string

@@ -4,15 +4,21 @@ namespace App\Livewire;
 
 use App\Models\Product;
 use App\Models\SaleItem;
+use Carbon\Carbon;
 use Livewire\Component;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Cache;
 
 class SalesReportsOverview extends Component
 {
+    use WithPagination;
+
     public string $activeTab = 'productSalesReport';
 
     public $productId = null;
-    public $products = [];
+    public $products;
     public $totalQuantitySold = 0;
 
 
@@ -24,7 +30,6 @@ class SalesReportsOverview extends Component
     public function mount()
     {
         $this->products = Product::all();
-
         $this->endDate = now()->toDateString(); // today
         $this->startDate = now()->subDays(6)->toDateString(); // 6 days ago (7 days total)
 
@@ -60,21 +65,35 @@ class SalesReportsOverview extends Component
 
     public function prepareChartData()
     {
-        $query = SaleItem::query()
-            ->whereBetween('created_at', [$this->startDate, $this->endDate]);
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
 
+        // Compose cache key based on product and date range
+        $cacheKey = "sales_{$this->productId}_{$startDate->toDateString()}_{$endDate->toDateString()}";
+
+        // Retrieve cached sales data or run the query if cache misses
+        $sales = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($startDate, $endDate) {
+            $query = SaleItem::query()
+                ->whereBetween('created_at', [$startDate, $endDate]);
+
+            if ($this->productId) {
+                $query->where('product_id', $this->productId);
+            }
+
+            return $query->selectRaw('DATE(created_at) as date, SUM(quantity) as total')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->keyBy('date');
+        });
+
+        $productName = 'All Products';
         if ($this->productId) {
-            $query->where('product_id', $this->productId);
+            $productName = Product::find($this->productId)?->name ?? $productName;
         }
 
-        $sales = $query->selectRaw('DATE(created_at) as date, SUM(quantity) as total')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->keyBy('date'); // key by date for easy lookup
-
         // Generate all dates between start and end
-        $period = CarbonPeriod::create($this->startDate, $this->endDate);
+        $period = CarbonPeriod::create($startDate, $endDate);
 
         $labels = [];
         $data = [];
@@ -90,7 +109,7 @@ class SalesReportsOverview extends Component
         $this->chartLabels = $labels;
         $this->chartData = $data;
 
-        $this->dispatch('refreshChart', $this->chartLabels, $this->chartData);
+        $this->dispatch('refreshChart', $this->chartLabels, $this->chartData, $productName);
     }
 
     public function render()

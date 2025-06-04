@@ -1,11 +1,11 @@
 <div>
-    <div class="" style="margin-top:20px;">
-        {{-- Product Dropdown --}}
-        <div class="bg-white rounded-lg overflow-hidden shadow p-4">
-            <label for="product-select" class="block mb-2 font-medium">Select a Product:</label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white rounded-lg overflow-hidden shadow p-4">
+
+        <div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                 <div>
+                    <label for="product-select" class="block mb-2 font-medium">Select a Product:</label>
                     <select id="product-select" wire:model="productId" wire:change="calculateTotalQuantity"
                         class="border rounded px-3 py-2 w-full max-w-sm">
                         <option value="">All Products</option>
@@ -15,20 +15,19 @@
                     </select>
                 </div>
 
-
-                <div class="flex space-x-2 mb-4">
+                <div class="flex space-x-2">
                     <div>
-                        <label for="startDate">Start Date:</label>
-                        <input type="date" id="startDate" wire:model.lazy="startDate" class="border rounded p-1">
+                        <label for="startDate" class="block mb-2 font-medium">Start Date:</label>
+                        <input type="date" id="startDate" wire:model.lazy="startDate"
+                            class="border rounded px-3 py-2 w-full max-w-sm">
                     </div>
 
                     <div style="margin-left:10px;">
-                        <label for="endDate">End Date:</label>
-                        <input type="date" id="endDate" wire:model.lazy="endDate" class="border rounded p-1">
+                        <label for="endDate" class="block mb-2 font-medium">End Date:</label>
+                        <input type="date" id="endDate" wire:model.lazy="endDate"
+                            class="border rounded px-3 py-2 w-full max-w-sm">
                     </div>
                 </div>
-
-
             </div>
 
             {{-- Total Quantity Display --}}
@@ -44,6 +43,10 @@
             </div>
         </div>
 
+        <div>
+            @livewire(\App\Filament\Widgets\ProductSalesReportWidget::class)
+        </div>
+
     </div>
 
     <div>
@@ -56,7 +59,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             let chart = null;
 
-            Livewire.on('refreshChart', ([labels, data]) => {
+            Livewire.on('refreshChart', ([labels, series, productName]) => {
                 setTimeout(() => {
                     const chartEl = document.querySelector("#chart");
 
@@ -70,9 +73,17 @@
                             type: 'bar',
                             height: 400,
                         },
+                        title: {
+                            text: productName,  // <-- Add your product name here
+                            align: 'center',
+                            style: {
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                            }
+                        },
                         series: [{
-                            name: 'Quantity Sold',
-                            data: data
+                            name: productName + ' Sold',
+                            data: series
                         }],
                         xaxis: {
                             categories: labels,
@@ -81,20 +92,22 @@
                             },
                             labels: {
                                 formatter: function (value) {
-                                    if (!value) return '';
                                     const date = new Date(value);
-                                    if (isNaN(date)) return '';
                                     return date.toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric'
+                                        year: 'numeric', month: 'short', day: 'numeric'
                                     });
                                 }
                             }
                         },
                         yaxis: {
                             title: {
-                                text: 'Quantity Sold'
+                                text: 'Item Sold'
+                            }
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function (val, opts) {
+                                return `${val}`; // just quantity, or customize as needed
                             }
                         }
                     };
@@ -106,9 +119,10 @@
                         chart.render();
                     }
 
-
                 }, 100); // small delay to allow DOM update
             });
+
+
         });
     </script>
 </div>

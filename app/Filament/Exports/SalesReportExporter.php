@@ -10,7 +10,6 @@ class SalesReportExporter extends ExportAction
 {
     public function handle()
     {
-        Log::info("test");
         $query = $this->getQuery();
 
         // Get the grouped data from the query

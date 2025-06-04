@@ -35,6 +35,8 @@ class SalesController extends Controller
             "total_discount" => "required|numeric|min:0",
         ]);
 
+        $discountName = $request->discount_name ?? null; // or get from elsewhere
+
         $data['sales_id'] = $saleId;
 
         $sale = Sale::create([
@@ -43,6 +45,7 @@ class SalesController extends Controller
             'payment_method' => 'cash',
             'amount_tendered' => $data['amount_tendered'],
             'change' => $data['change'],
+            'discount_name' => $discountName,
             'total_discount' => $data['total_discount'],
             'status' => 'completed'
         ]);
