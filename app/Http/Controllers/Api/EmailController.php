@@ -12,8 +12,8 @@ class EmailController extends Controller
     public function send(Request $request)
     {
         $validated = $request->validate([
-            'sales_id' => 'required|integer',
-            'date' => 'required|date',
+            'sales_id' => 'required',
+            'date' => 'required',
             'total_amount' => 'required|numeric',
             'discount' => 'required|numeric',
             'items' => 'required|array',
