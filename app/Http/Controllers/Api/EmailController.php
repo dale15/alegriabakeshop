@@ -3,25 +3,50 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\SendReceiptEmail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+
+use Brevo\Client\Configuration;
+use Brevo\Client\Api\TransactionalEmailsApi;
+use Brevo\Client\Model\SendSmtpEmail;
+use GuzzleHttp\Client as GuzzleClient;
 
 class EmailController extends Controller
 {
     public function send(Request $request)
     {
         $validated = $request->validate([
-            'sales_id' => 'required',
-            'date' => 'required',
+            'sales_id' => 'required|integer',
+            'date' => 'required|date',
             'total_amount' => 'required|numeric',
             'discount' => 'required|numeric',
             'items' => 'required|array',
             'email' => 'required|email',
         ]);
 
-        Mail::to($validated['email'])->send(new SendReceiptEmail($validated));
+        $htmlContent = view('emails.receipt', ['data' => $validated])->render();
 
-        return response()->json(['message' => 'Email sent successfully']);
+        $config = Configuration::getDefaultConfiguration()
+            ->setApiKey('api-key', env('BREVO_API_KEY'));
+
+        $apiInstance = new TransactionalEmailsApi(new GuzzleClient(), $config);
+
+        $sendSmtpEmail = new SendSmtpEmail([
+            'subject' => 'Receipt #' . $validated['sales_id'],
+            'htmlContent' => $htmlContent,
+            'sender' => [
+                'name' => 'Alegria Bakeshop',
+                'email' => 'josephcajida8@gmail.com',
+            ],
+            'to' => [
+                ['email' => $validated['email'], 'name' => 'Customer']
+            ],
+        ]);
+
+        try {
+            $apiInstance->sendTransacEmail($sendSmtpEmail);
+            return response()->json(['message' => 'Email sent successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
