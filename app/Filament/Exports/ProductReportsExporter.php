@@ -20,7 +20,7 @@ class ProductReportsExporter implements FromQuery, WithHeadings, WithMapping
                 SUM(quantity) as total_quantity, 
                 SUM(total) as total_sales, 
                 SUM(total_cost_price) as total_cost,
-                SUM(total) - SUM(cost_price) as gross_profit')
+                SUM(total) - SUM(total_cost_price) as gross_profit')
             ->with('product')
             ->groupBy('product_id');
     }
