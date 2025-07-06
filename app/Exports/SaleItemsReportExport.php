@@ -42,6 +42,7 @@ class SaleItemsReportExport implements FromQuery, WithHeadings, WithMapping
             $saleItem->sale_date,
             $saleItem->total_sales,
             $saleItem->cost_price,
+            $saleItem->total_discount,
             $saleItem->gross_profit,
         ];
     }
