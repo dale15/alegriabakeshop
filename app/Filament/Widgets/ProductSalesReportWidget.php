@@ -3,9 +3,11 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Exports\ProductReportsExporter;
+use App\Models\Product;
 use App\Models\SaleItem;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,9 +20,9 @@ class ProductSalesReportWidget extends BaseWidget
     public function getTableQuery(): Builder
     {
         return SaleItem::query()
-            ->selectRaw('MIN(id) as id, product_id, 
-                SUM(quantity) as total_quantity, 
-                SUM(total) as total_sales, 
+            ->selectRaw('MIN(id) as id, product_id,
+                SUM(quantity) as total_quantity,
+                SUM(total) as total_sales,
                 SUM(total_cost_price) as total_cost,
                 SUM(total) - SUM(total_cost_price) as gross_profit')
             ->with('product')
@@ -46,6 +48,13 @@ class ProductSalesReportWidget extends BaseWidget
                 TextColumn::make('total_sales')->label('Net Sales')->money('PHP'),
                 TextColumn::make('total_cost')->label('Cost of Goods')->money('PHP'),
                 TextColumn::make('gross_profit')->label('Gross Profit')->money('PHP'),
+            ])
+            ->filters([
+                SelectFilter::make('product_id')
+                    ->label('Filter by Product')
+                    ->options(
+                        Product::all()->pluck('name', 'id')->toArray()
+                    ),
             ]);
     }
 }
